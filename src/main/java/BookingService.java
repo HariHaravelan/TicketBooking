@@ -10,15 +10,15 @@ public class BookingService {
         this.ticketCenter = ticketCenter;
     }
 
-    public BookingResponse bookTicket(String user, Card card, double amount) {
+    public Record bookTicket(String user, Card card, double amount) {
         if (ticketCenter.canBook()) {
             try {
                 paymentGateway.charge(card, amount);
             } catch (CannotChargeException e) {
-                return new BookingResponse(BookingStatus.PAYMENT_ERROR, Optional.empty());
+                return new Record(BookingStatus.PAYMENT_ERROR, Optional.empty());
             }
-            return new BookingResponse(BookingStatus.SUCCESS, Optional.of(ticketCenter.book(user)));
+            return new Record(BookingStatus.SUCCESS, Optional.of(ticketCenter.book(user)));
         }
-        return new BookingResponse(BookingStatus.SOLD_OUT, Optional.empty());
+        return new Record(BookingStatus.SOLD_OUT, Optional.empty());
     }
 }

@@ -12,6 +12,9 @@ public class Ticket {
 
     @Override
     public boolean equals(Object obj) {
+        if (!(obj instanceof Ticket)) {
+            return false;
+        }
         return this.user.equals(((Ticket) obj).user);
     }
 }

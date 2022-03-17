@@ -25,42 +25,45 @@ class BookingServiceTest {
         String johnDoe = "John Doe";
         Card amex = new Card("AMEX", 1000);
         Ticket ticket = new Ticket(johnDoe);
-        BookingResponse successBookingResponse = new BookingResponse(BookingStatus.SUCCESS, Optional.of(ticket));
+        Record successRecord = new Record(BookingStatus.SUCCESS, Optional.of(ticket));
 
         when(ticketCenter.canBook()).thenReturn(true);
         doNothing().when(paymentGateway).charge(eq(amex), eq(675.00));
         when(ticketCenter.book(eq(johnDoe))).thenReturn(ticket);
 
-        BookingResponse bookingResponse = bookingService.bookTicket(johnDoe, amex, 675.00);
+        Record record = bookingService.bookTicket(johnDoe, amex, 675.00);
 
-        assertEquals(successBookingResponse, bookingResponse);
+        assertEquals(successRecord, record);
     }
 
     @Test
     public void shouldReturnPaymentErrorWhenPaymentGatewayThrowsException() throws CannotChargeException {
+        //Arrange or Given
         String johnDoe = "John Doe";
         Card visaCard = new Card("VISA", 1000);
-        BookingResponse paymentErrorBookingResponse = new BookingResponse(BookingStatus.PAYMENT_ERROR, Optional.empty());
+        Record paymentErrorRecord = new Record(BookingStatus.PAYMENT_ERROR, Optional.empty());
 
+        //Act or When
         when(ticketCenter.canBook()).thenReturn(true);
         doThrow(new CannotChargeException("low balance")).when(paymentGateway).charge(eq(visaCard), eq(500.00));
 
-        BookingResponse actualBookingResponse = bookingService.bookTicket(johnDoe, visaCard, 500.00);
+        Record actualRecord = bookingService.bookTicket(johnDoe, visaCard, 500.00);
 
-        assertEquals(paymentErrorBookingResponse, actualBookingResponse);
+        //Assert or Then
+        assertEquals(paymentErrorRecord, actualRecord);
     }
 
     @Test
     public void shouldReturnSoldOutWhenTicketCenterCannotBook() throws CannotChargeException {
         String johnDoe = "John Doe";
         Card visaCard = new Card("VISA", 1000);
-        BookingResponse soldOutBookingResponse = new BookingResponse(BookingStatus.SOLD_OUT, Optional.empty());
+        Record soldOutRecord = new Record(BookingStatus.SOLD_OUT, Optional.empty());
 
         when(ticketCenter.canBook()).thenReturn(false);
 
-        BookingResponse bookingResponse = bookingService.bookTicket(johnDoe, visaCard, 500.00);
+        Record record = bookingService.bookTicket(johnDoe, visaCard, 500.00);
 
-        assertEquals(soldOutBookingResponse, bookingResponse);
+        assertEquals(soldOutRecord, record);
     }
 
 }
